@@ -69,3 +69,4 @@ src_managed/
 
 build.properties
 metals.sbt
+.scalafmt.conf
