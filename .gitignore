@@ -21,3 +21,51 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+
+
+# === sbt build ===
+target/
+project/project/
+project/target/
+.bloop/
+.bsp/
+.metals/
+.idea/
+.vscode/
+logs/
+dist/
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === Scala formatting / caches ===
+.scalafmt.conf.cache
+.scala-build/
+.metals.sbt/
+.metals.cache/
+
+# === VSCode ===
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# === bloop/metals ===
+.bloop/
+.metals/
+
+# === temporary files ===
+*.class
+*.log
+*.out
+*.tmp
+*.swp
+
+# === dependency caches ===
+lib_managed/
+src_managed/
+
+# 
+
+build.properties
+metals.sbt
