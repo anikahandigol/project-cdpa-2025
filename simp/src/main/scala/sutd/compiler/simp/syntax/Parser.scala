@@ -183,7 +183,83 @@ object Parser {
     * contains left recursion
     * @return
     */
-  def p_exp: Parser[PEnv, Exp] = empty(ConstExp(IntConst(1))) // fixme
+
+  /**
+    * S ::= X = E ; | return X ; | nop | if E { \overline{S} } else { \overline{S} } | while E { \overline{S} } 
+    * E ::= E Op E | X | C | (E)
+    * \overline{S} ::= S | S \overline{S}
+    * Op ::= + | - | *  
+    * C ::= 1 | 2 | ... | true | false 
+    * X ::= a | b | c | d 
+
+    New grammar without left recursion
+    S ::= X = E ; | return X ; | nop | if E { \overline{S} } else { \overline{S} } | while E { \overline{S} } 
+
+    E  ::=  TE'
+    T ::=  X | C | (E)
+    E' ::=  op T E' | eps
+
+    \overline{S} ::= S | S \overline{S}
+    Op ::= + | - | *  
+    C ::= 1 | 2 | ... | true | false 
+    X ::= a | b | c | d 
+
+    * */
+
+  def p_exp: Parser[PEnv, Exp] = for {
+    first <- p_term
+    _ <- p_spaces
+    rest <- manyOp(p_op_term)
+    result = rest.foldLeft(first)((acc, op_term) => create_binary_op(op_term._1, acc, op_term._2))
+  } yield result
+
+  // Parse term
+  def p_term: Parser[PEnv, Exp] = {
+    val p_variable = for {
+      v <- p_var
+    } yield VarExp(v)
+    
+    val p_constant = for {
+      c <- p_const  
+    } yield ConstExp(c)
+    
+    val p_paren = for {
+      _ <- p_lparen
+      _ <- p_spaces
+      e <- p_exp
+      _ <- p_spaces  
+      _ <- p_rparen
+    } yield ParenExp(e)
+    
+    choice(choice(p_variable)(p_constant))(p_paren)
+  }
+
+  // Parse op
+  def p_op: Parser[PEnv, LToken] = {
+    choice(
+      choice(
+        choice(
+          choice(p_plus)(p_minus))(p_mult))(p_lthan))(p_dequal)
+  }
+
+  // Parse op followed by term
+  def p_op_term: Parser[PEnv, (LToken, Exp)] = for {
+    op <- p_op
+    _ <- p_spaces
+    term <- p_term
+  } yield (op, term)
+
+  // create binary AST node
+  def create_binary_op(op: LToken, left: Exp, right: Exp): Exp = op match {
+    case PlusSign(_) => Plus(left, right)
+    case MinusSign(_) => Minus(left, right)  
+    case AsterixSign(_) => Mult(left, right)
+    case LThanSign(_) => LThan(left, right)
+    case DEqSign(_) => DEqual(left, right)
+    case _ => throw new RuntimeException(s"Unexpected op token: $op")
+  }
+
+
   /** Lab 1 Task 1.2 end */
 
   /** Parsing operator symbols
