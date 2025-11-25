@@ -20,7 +20,7 @@ object SimpInt {
       *  the rules are partial function, hence we need an Either[ErrMsg,_] monad
       * @param dlt - the variable environment 
       * @param e   - the expression to be evaluated
-      * @return either errror or the const
+      * @return either error or the const
       */
     def evalExp(dlt:Delta, e:Exp):Either[ErrMsg, Const] = e match {
       case ConstExp(l) => Right(l) 
@@ -50,7 +50,11 @@ object SimpInt {
         c3 <- plusConst(c1,c2)
       } yield c3
       // Lab 2 Task 1.1
-      case _ => Left("TODO") // fixme
+      case VarExp(v) => dlt.get(v) match { // dlt is a map, has get method
+        case Some(c) => Right(c)
+        case None => Left(s"undefined variable ${v}")
+      }
+      case ParenExp(e) => evalExp(dlt, e)
       // Lab 2 Task 1.1 end
     }
 
@@ -72,7 +76,10 @@ object SimpInt {
       def eval(dlt:Delta, ss:List[A]):Either[ErrMsg, Delta] = ss match {
         case Nil => Right(dlt) 
         // Lab 2 Task 1.2 
-        case _ => Left("TODO") // fixme
+        case (s::rest) => for {
+          dlt_1 <- i.eval(dlt, s)
+          dlt_2 <- eval(dlt_1, rest)
+        } yield dlt_2
         // Lab 2 Task 1.2 end
       }
     }
@@ -93,7 +100,17 @@ object SimpInt {
         } yield dlt_2
         case Ret(x) => Right(dlt)
         // Lab 2 Task 1.2 
-        case _ => Left("TODO") // fixme
+        case While(cond, b) => for {
+          c <- evalExp(dlt, cond)
+          dlt_2 <- c match {
+            case IntConst(_) => Left("int expression found in the while condition position.")
+            case BoolConst(true) => for {
+              dlt_1 <- evalMany.eval(dlt, b)
+              dlt_2 <- evalOne.eval(dlt_1, While(cond, b))
+            } yield dlt_2
+            case BoolConst(false) => Right(dlt)
+          }
+        } yield dlt_2
         // Lab 2 Task 1.2 end
       }
 
