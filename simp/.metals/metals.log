@@ -106,3 +106,26 @@ INFO: Unsupported notification method: $/setTrace
 2024.10.04 08:55:17 INFO  Shutting down server[0m
 2024.10.04 08:55:17 INFO  shutting down Metals[0m
 2024.10.04 08:55:17 INFO  Exiting server[0m
+2025.12.05 00:37:57 INFO  Started: Metals version 1.6.4 in folders '/home/emfor/compiler/project-cdpa-2025/simp' for client Visual Studio Code 1.106.3.[0m
+2025.12.05 00:38:00 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.[0m
+2025.12.05 00:38:00 INFO  no build target found for /home/emfor/compiler/project-cdpa-2025/simp/src/main/scala/sutd/compiler/simp/syntax/Parser.scala. Using presentation compiler with project's scala-library version: 3.3.6[0m
+2025.12.05 00:38:00 INFO  Attempting to connect to the build server...[0m
+2025.12.05 00:38:00 INFO  No running Bloop server found, starting one.[0m
+2025.12.05 00:38:01 INFO  Starting compilation server[0m
+2025.12.05 00:38:02 INFO  no build target found for /home/emfor/compiler/project-cdpa-2025/simp/src/main/scala/sutd/compiler/simp/syntax/Parser.scala. Using presentation compiler with project's scala-library version: 3.3.6[0m
+2025.12.05 00:38:03 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/emfor/compiler/project-cdpa-2025/simp/.metals/bsp.trace.json or /home/emfor/.cache/metals/bsp.trace.json[0m
+2025.12.05 00:38:03 INFO  Attempting to connect to the build server...[0m
+2025.12.05 00:38:03 INFO  Found a Bloop server running[0m
+2025.12.05 00:38:03 INFO  Attempting to connect to the build server...[0m
+2025.12.05 00:38:03 INFO  Found a Bloop server running[0m
+2025.12.05 00:38:03 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/emfor/compiler/project-cdpa-2025/simp/project/project/.metals/bsp.trace.json or /home/emfor/.cache/metals/bsp.trace.json[0m
+2025.12.05 00:38:03 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/emfor/compiler/project-cdpa-2025/simp/project/.metals/bsp.trace.json or /home/emfor/.cache/metals/bsp.trace.json[0m
+2025.12.05 00:38:05 INFO  time: Connected to build server in 4.98s[0m
+2025.12.05 00:38:05 INFO  Connected to Build server: Bloop v2.0.17[0m
+2025.12.05 00:38:06 INFO  time: Imported build in 0.14s[0m
+2025.12.05 00:38:06 INFO  Shutting down server[0m
+2025.12.05 00:38:06 INFO  shutting down Metals[0m
+2025.12.05 00:38:06 INFO  Shut down connection with build server.[0m
+2025.12.05 00:38:06 INFO  Shut down connection with build server.[0m
+2025.12.05 00:38:06 INFO  Shut down connection with build server.[0m
+2025.12.05 00:38:06 INFO  Exiting server[0m
