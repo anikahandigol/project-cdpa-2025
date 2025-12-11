@@ -34,7 +34,7 @@ object DF {
         The algorithm starts from vertex 0 which is the starting statement.
         Given vertex n in Graph G, 
         case 1: n has only 1 successor m in the CFG
-            we create Node(n, List(t)), where t is generated recurssively using m against (G - {n})
+            we create Node(n, List(t)), where t is generated recursively using m against (G - {n})
         case 2: n has 2 successors m and k, m and k share some common nearest descendant j in (G - {n})
             (given two common descendant, j and l, j is nearer than l if j < l, 
                 since we generate the labels by following the sequential structure of the program)
@@ -166,7 +166,11 @@ object DF {
 
     // df local implementation from cytron's lemma 2
     // Task 1.1 TODO 
-    def dfLocal(x:Label, dt:DomTree, g:CFG):List[Label] = Nil // TODO: fixme
+    def dfLocal(x:Label, dt:DomTree, g:CFG):List[Label] = {
+        val succs = successors(g, x)
+        val children = childOf(x, dt)
+        succs.filter(y => !children.contains(y))
+    }
 
     /**
       * Build dominance frontier table 
@@ -181,7 +185,12 @@ object DF {
         def go(acc:DFTable, x:Label):DFTable = {
             val df_local = dfLocal(x, dt, g)
             // Task 1.1 TODO 
-            def dfUp(u:Label):List[Label] = Nil // TODO: fixme
+            def dfUp(u:Label):List[Label] = {
+                acc.get(u) match {
+                    case None => Nil
+                    case Some(df_u) => df_u.filter(y => !isChildOf(y, x, dt))
+                }
+            }
             
             val df_up = childOf(x,dt).flatMap(u => dfUp(u))
             acc + (x -> (df_local ++ df_up))

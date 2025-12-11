@@ -62,8 +62,19 @@ object SignAnalysis {
       * @return
       */
     // Cohort Problem Exercise 2
-    def join(preds:List[AbstractState]):AbstractState = // TODO: Fixme
-        Map()
+    def join(preds:List[AbstractState]):AbstractState = {
+        if (preds.isEmpty) {
+            Map()
+        } else {
+            val allVars = preds.flatMap(_.keys).toSet
+            // compute the lub of sign of each var across all pred
+            allVars.map(v => {
+                val signs = preds.flatMap(state => state.get(v))
+                val joinedSign = if (signs.isEmpty) Bot else signs.reduce(signLattice.lub)
+                (v, joinedSign)
+            }).toMap
+        }
+    }
 
     type MonotoneFunction = AbstractEnv => Either[String, AbstractEnv]
 
@@ -103,11 +114,49 @@ object SignAnalysis {
                 }
               }
               // Cohort Problem Exercise 3
-              // TODO
               /**
-                * case l: t <- src1 op src2:  s_l = join(s_l)[t -> join(s_l)(src1) abs(op) join(s_l)(src1)]
+                * case l: t <- src1 op src2:  s_l = join(s_l)[t -> join(s_l)(src1) abs(op) join(s_l)(src2)]
                 */
-              // YOUR CODE HERE 
+              case (label, IPlus(Temp(AVar(t)), src1, src2)) => {
+                val joined_preds_states = joinPredStates(label, acc)
+                for {
+                  sign1 <- getOprSign(joined_preds_states, src1)
+                  sign2 <- getOprSign(joined_preds_states, src2)
+                  result = absPlus(sign1, sign2)
+                } yield acc + (label -> (joined_preds_states + (t -> result)))
+              }
+              case (label, IMinus(Temp(AVar(t)), src1, src2)) => {
+                val joined_preds_states = joinPredStates(label, acc)
+                for {
+                  sign1 <- getOprSign(joined_preds_states, src1)
+                  sign2 <- getOprSign(joined_preds_states, src2)
+                  result = absMinus(sign1, sign2)
+                } yield acc + (label -> (joined_preds_states + (t -> result)))
+              }
+              case (label, IMult(Temp(AVar(t)), src1, src2)) => {
+                val joined_preds_states = joinPredStates(label, acc)
+                for {
+                  sign1 <- getOprSign(joined_preds_states, src1)
+                  sign2 <- getOprSign(joined_preds_states, src2)
+                  result = absMult(sign1, sign2)
+                } yield acc + (label -> (joined_preds_states + (t -> result)))
+              }
+              case (label, IDEqual(Temp(AVar(t)), src1, src2)) => {
+                val joined_preds_states = joinPredStates(label, acc)
+                for {
+                  sign1 <- getOprSign(joined_preds_states, src1)
+                  sign2 <- getOprSign(joined_preds_states, src2)
+                  result = absDEqual(sign1, sign2)
+                } yield acc + (label -> (joined_preds_states + (t -> result)))
+              }
+              case (label, ILThan(Temp(AVar(t)), src1, src2)) => {
+                val joined_preds_states = joinPredStates(label, acc)
+                for {
+                  sign1 <- getOprSign(joined_preds_states, src1)
+                  sign2 <- getOprSign(joined_preds_states, src2)
+                  result = absLThan(sign1, sign2)
+                } yield acc + (label -> (joined_preds_states + (t -> result)))
+              }
               /**
                 * other cases: s_l = join(s_l)
                 */

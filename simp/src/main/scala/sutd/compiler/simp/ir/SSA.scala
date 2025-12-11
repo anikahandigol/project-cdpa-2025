@@ -52,9 +52,40 @@ object SSA {
     def insertPhis(pa:List[LabeledInstr], dft:DFTable, g:CFG):P = {
         // A list of pairs. Each pair consists of a label l and the set of variables that are modified in l 
         val labels_modded_vars:List[(Label, List[String])] = pa.map( li => modVars(li))
+        
         // Task 1.2 TODO
-        val e:E = Map():E // TODO: fixme
-        val pa_with_phis:List[SSALabeledInstr] = Nil // TODO: fixme 
+        // all unique var modified in program
+        val all_vars = labels_modded_vars.flatMap(_._2).distinct
+        
+        // computing which labels modify it
+        val var_to_labels:Map[String, List[Label]] = all_vars.map(v => 
+            v -> labels_modded_vars.filter(_._2.contains(v)).map(_._1)
+        ).toMap
+        
+        //  DF+ of modification sites for each var
+        val var_to_dfplus:Map[String, List[Label]] = var_to_labels.map {
+            case (v, labels) => v -> dfPlus(dft, labels)
+        }
+        
+        val all_labels = pa.map(_._1)
+        val e:E = all_labels.map { label =>
+            val vars_needing_phi = all_vars.filter(v => var_to_dfplus(v).contains(label))
+            label -> vars_needing_phi
+        }.toMap
+
+        val pa_with_phis:List[SSALabeledInstr] = pa.map {
+            case (label, instr) =>
+                // Get variables that need phi assignments at this label
+                val phi_vars = e.getOrElse(label, Nil)
+                // Get predecessors of this label to build phi operands
+                val preds = predecessors(g, label)
+                
+                val phis = phi_vars.map { v =>
+                    val operands = preds.map(pred => (pred, AVar(v)))
+                    PhiAssignment(Temp(AVar(v)), operands, Temp(AVar(v)))
+                }
+                (label, phis, instr)
+        }
 
         val p = pa_with_phis.foldLeft(Map():P)((acc:P, li:SSALabeledInstr) => li match {
             case (l, phis, i) =>  acc + (l -> li)
